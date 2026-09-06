@@ -4,6 +4,80 @@ entries:
   - annotations:
       artifacthub.io/category: database
       artifacthub.io/changes: |
+        - "The object browser now lists only your own tables on six PostgreSQL-family engines. It was showing each engine internal schema as if it were user data - 61 objects on TimescaleDB where 2 were the user tables (the rest hypertable chunks and catalog), 10 on AlloyDB Omni, 4 on Apache Cloudberry - and on CockroachDB the Monitoring overview counted 98 tables for the 2 the browser listed, so the two panels disagreed inside one app. Extension-created schemas are now excluded by ownership rather than by name, so a schema you created yourself is never hidden"
+        - "A row count the engine has not actually measured now reads as blank instead of 0. PostgreSQL writes -1 into pg_class.reltuples for a table nothing has analysed yet, which was being clamped to zero - so every table in a freshly restored dump claimed to be empty until autovacuum caught up. A genuine empty table still reads 0"
+        - "Materialize and CockroachDB recover instead of failing. Their object browsers were blank and their Monitoring pages showed a connection error; both now read schema and render every panel, with statistics those engines do not publish marked unavailable rather than reported as zero. Materialized views are listed beside tables"
+        - "A table dropped while the schema was being read no longer fails the whole read. Under concurrent DDL this killed roughly a quarter of schema loads on PostgreSQL; the relation is now resolved without raising"
+        - "Monitoring panels tell two absences apart. A statistic an engine simply does not publish now says so, and is no longer presented as a database fault; a query the engine actually refused still shows its own error, so a restriction you can act on stays visible"
+        - "SQL Server and Oracle overviews no longer report a size they could not read as 0 bytes"
+        - "Track app release 0.14.0 (appVersion bump; default image tag follows)"
+      artifacthub.io/containsSecurityUpdates: "false"
+      artifacthub.io/images: |
+        - name: libredb-studio
+          image: ghcr.io/libredb/libredb-studio:0.14.0
+          platforms:
+            - linux/amd64
+            - linux/arm64
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Documentation
+          url: https://github.com/libredb/libredb-studio#readme
+        - name: Container Image
+          url: https://github.com/libredb/libredb-studio/pkgs/container/libredb-studio
+        - name: Source
+          url: https://github.com/libredb/libredb-studio
+      artifacthub.io/prerelease: "false"
+    apiVersion: v2
+    appVersion: 0.14.0
+    created: "2026-09-06T11:48:29.05349812Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 16.x.x
+    description: Web-based SQL IDE for cloud-native teams supporting sixteen engines
+      - PostgreSQL, MySQL, SQLite, DuckDB, Oracle, SQL Server, MongoDB, Redis, Couchbase,
+      ClickHouse, Apache Druid, Elasticsearch, OpenSearch, Apache Trino, Apache Cassandra
+      and libSQL
+    digest: 3aec6af669420e203d762590c196f4f469cc632d2517acfa27f2479ba695726f
+    home: https://github.com/libredb/libredb-studio
+    icon: https://raw.githubusercontent.com/libredb/libredb-studio/main/public/logo.svg
+    keywords:
+    - sql
+    - ide
+    - database
+    - postgresql
+    - mysql
+    - mongodb
+    - redis
+    - sqlite
+    - oracle
+    - mssql
+    - couchbase
+    - clickhouse
+    - druid
+    - elasticsearch
+    - opensearch
+    - trino
+    - cassandra
+    - libsql
+    - turso
+    - duckdb
+    - web-ide
+    kubeVersion: '>=1.26.0-0'
+    maintainers:
+    - name: cevheri
+      url: https://github.com/cevheri
+    name: libredb-studio
+    sources:
+    - https://github.com/libredb/libredb-studio
+    type: application
+    urls:
+    - https://github.com/libredb/libredb-studio/releases/download/libredb-studio-0.1.59/libredb-studio-0.1.59.tgz
+    version: 0.1.59
+  - annotations:
+      artifacthub.io/category: database
+      artifacthub.io/changes: |
         - "The published npm package now declares its licence. package.json carried no license field, so @libredb/studio rendered on npm as unlicensed even though the project has been MIT since its first release and the LICENSE file was always inside the tarball - npm includes it regardless of the files list. The declaration is what package managers, mirrors and licence scanners read, and only a new release can carry it. No chart template, value or image behaviour moves"
         - "Track app release 0.13.7 (appVersion bump; default image tag follows)"
       artifacthub.io/containsSecurityUpdates: "false"
@@ -3456,4 +3530,4 @@ entries:
     urls:
     - https://github.com/libredb/libredb-studio/releases/download/libredb-studio-0.1.0/libredb-studio-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-31T20:48:24.844808714Z"
+generated: "2026-09-06T11:48:29.045458265Z"
