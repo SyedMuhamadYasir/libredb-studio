@@ -11,7 +11,9 @@ index and constraint drops use the unconditional forms, which avoid depending on
 release's support for `IF EXISTS`. A generated migration is not an idempotent script.
 
 Removed foreign keys and indexes precede column changes, so an indexed column can be removed
-and an index name can be reused in the same table diff. Identifier quoting escapes delimiters;
+and an index name can be reused in the same table diff. Changes to an existing index's columns,
+column order or uniqueness replace its old definition; a uniqueness change can fail if existing
+data violates the new constraint. Identifier quoting escapes delimiters;
 line breaks in informational comments are flattened so metadata cannot start a SQL statement.
 
 MongoDB, Redis, LibreDB, Couchbase, Druid, Elasticsearch and OpenSearch receive an explanatory

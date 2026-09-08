@@ -104,14 +104,29 @@ async function probe(
       },
     ],
     indexes: [
-      { action: "removed", indexName: "idx_old", changes: [] },
-      { action: "added", indexName: "idx_old", targetColumns: ["extra"], changes: [] },
+      { action: "modified", indexName: "idx_old", sourceColumns: ["old"], targetColumns: ["extra"], changes: [] },
     ],
     foreignKeys: [{ action: "removed", columnName: "old", changes: [] }],
   });
   assert.equal(Number(await scalar(`SELECT ${q("extra")} FROM ${q("items")}`)), 7);
   assert.equal(Number(await scalar(`SELECT COUNT(*) FROM ${q("items")}`)), 1);
   await assert.rejects(() => run(`SELECT ${q("old")} FROM ${q("items")}`));
+
+  // A uniqueness-only diff must replace the index and enforce the new rule.
+  await generated({
+    indexes: [
+      {
+        action: "modified",
+        indexName: "idx_old",
+        sourceColumns: ["extra"],
+        targetColumns: ["extra"],
+        sourceUnique: false,
+        targetUnique: true,
+        changes: [],
+      },
+    ],
+  });
+  await assert.rejects(() => run(`INSERT INTO ${q("items")} (${q("id")}, ${q("extra")}) VALUES (2, 7)`));
 
   // Newlines and quote delimiters in metadata must stay inside identifiers, never
   // turn the generator's informational comment into an executable DELETE.

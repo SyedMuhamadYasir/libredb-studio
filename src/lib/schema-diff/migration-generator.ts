@@ -434,9 +434,10 @@ function generateAlterTable(table: TableDiff, dialect: DatabaseType): string {
       }
     });
 
-  // Removed indexes
+  // Changed indexes need replacement too. Drop the old definition before column
+  // changes, then recreate it with the target columns and uniqueness below.
   table.indexes
-    .filter((i) => i.action === "removed")
+    .filter((i) => i.action === "removed" || i.action === "modified")
     .forEach((idx) => {
       const refusal = NO_PORTABLE_INDEX_DDL[dialect];
       if (refusal) {
@@ -572,9 +573,9 @@ function generateAlterTable(table: TableDiff, dialect: DatabaseType): string {
       }
     });
 
-  // Added indexes
+  // Added and replaced indexes
   table.indexes
-    .filter((i) => i.action === "added")
+    .filter((i) => i.action === "added" || i.action === "modified")
     .forEach((idx) => {
       const refusal = NO_PORTABLE_INDEX_DDL[dialect];
       if (refusal) {
